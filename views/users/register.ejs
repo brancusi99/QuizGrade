@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - QuizGrade</title>
+    <link rel="stylesheet" href="/register.css">
+</head>
+<body>
+    <div class="container">
+        <img src="/Assets/logo.png" class="logo" alt="QuizGrade Logo">
+        <h2>Înregistrare</h2>
+
+        <form id="registerForm" action="/users" method="POST">
+            <input type="text" name="name" placeholder="Nume complet" required>
+            <input type="email" name="email" placeholder="Email" required>
+            <input type="password" name="password" placeholder="Parola" required>
+            <button type="submit">Creează cont</button>
+        </form>
+
+        <p>Ai deja cont? <a href="/users/login">Autentifică-te</a></p>
+    </div>
+    
+    </body>
+</html>

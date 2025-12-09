@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Quiz - QuizGrade</title>
+    <link rel="stylesheet" href="/create_page.css">
+</head>
+<body>
+
+    <div class="container">
+        <h1>Create New Quiz</h1>
+        
+        <form action="/quizzes" method="POST" id="quizForm">
+            <div class="form-group">
+                <label>Quiz Title</label>
+                <input type="text" name="title" placeholder="e.g., Math Final Exam" required>
+            </div>
+
+            <div id="questions-container">
+                </div>
+
+            <div class="btn-container">
+                <button type="button" class="btn btn-add" onclick="addQuestion()">+ Add Question</button>
+                <button type="submit" class="btn btn-save">Save Quiz</button>
+            </div>
+        </form>
+    </div>
+
+    <template id="question-template">
+        <div class="question-card">
+            <button type="button" class="remove-btn" onclick="removeQuestion(this)">Remove</button>
+            
+            <div class="form-group">
+                <label>Question Text</label>
+                <input type="text" name="questions[][text]" placeholder="Enter your question here" required>
+            </div>
+
+            <div class="form-group">
+                <label>Question Type</label>
+                <select name="questions[][type]" onchange="changeType(this)">
+                    <option value="multiple-choice">Multiple Choice</option>
+                    <option value="fill-blank">Fill in the Blank</option>
+                </select>
+            </div>
+
+            <div class="answer-section">
+                <label>Answers (Select the correct bubble)</label>
+                <div class="mc-option">
+                    <input type="radio" name="correct_answer_temp" required>
+                    <input type="text" name="questions[][options][]" placeholder="Option A" required>
+                </div>
+                <div class="mc-option">
+                    <input type="radio" name="correct_answer_temp">
+                    <input type="text" name="questions[][options][]" placeholder="Option B" required>
+                </div>
+                <div class="mc-option">
+                    <input type="radio" name="correct_answer_temp">
+                    <input type="text" name="questions[][options][]" placeholder="Option C">
+                </div>
+                <div class="mc-option">
+                    <input type="radio" name="correct_answer_temp">
+                    <input type="text" name="questions[][options][]" placeholder="Option D">
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <script>
+        let questionCount = 0;
+
+        function addQuestion() {
+            questionCount++;
+            const container = document.getElementById('questions-container');
+            const template = document.getElementById('question-template');
+
+            const clone = template.content.cloneNode(true);
+
+            const radios = clone.querySelectorAll('input[type="radio"]');
+            radios.forEach(radio => {
+                radio.name = `q${questionCount}_correct`;
+                radio.value = radio.nextElementSibling.name; 
+            });
+
+            container.appendChild(clone);
+        }
+
+        function removeQuestion(button) {
+            button.parentElement.remove();
+        }
+
+        function changeType(select) {
+            const card = select.closest('.question-card');
+            const answerSection = card.querySelector('.answer-section');
+            
+            if (select.value === 'fill-blank') {
+                answerSection.innerHTML = `
+                    <label>Correct Answer</label>
+                    <input type="text" name="questions[][correct_answer]" placeholder="Type the correct word/phrase" required>
+                `;
+            } else {
+                const uniqueName = 'q' + Math.random().toString(36).substr(2, 9);
+                answerSection.innerHTML = `
+                    <label>Answers (Select the correct bubble)</label>
+                    <div class="mc-option">
+                        <input type="radio" name="${uniqueName}" required>
+                        <input type="text" name="questions[][options][]" placeholder="Option A" required>
+                    </div>
+                    <div class="mc-option">
+                        <input type="radio" name="${uniqueName}">
+                        <input type="text" name="questions[][options][]" placeholder="Option B" required>
+                    </div>
+                    <div class="mc-option">
+                        <input type="radio" name="${uniqueName}">
+                        <input type="text" name="questions[][options][]" placeholder="Option C">
+                    </div>
+                    <div class="mc-option">
+                        <input type="radio" name="${uniqueName}">
+                        <input type="text" name="questions[][options][]" placeholder="Option D">
+                    </div>
+                `;
+            }
+        }
+        window.onload = addQuestion;
+    </script>
+</body>
+</html>

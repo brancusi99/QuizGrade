@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - QuizGrade</title>
+    <link rel="stylesheet" href="/login.css">
+</head>
+<body>
+    <div class="container">
+        <img src="/Assets/logo.png" class="logo" alt="QuizGrade Logo">
+        <h2>Autentificare</h2>
+
+        <form id="loginForm" action="/users/login" method="POST">
+            <input type="email" name="email" placeholder="Email" required>
+            <input type="password" name="password" placeholder="Parolă" required>
+            <button type="submit">Login</button>
+        </form>
+
+        <p>Nu ai cont? <a href="new">Creează unul</a></p>
+    </div>
+
+    </body>
+</html>
