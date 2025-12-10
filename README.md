@@ -1,5 +1,5 @@
 **Quiz Grade** is a fully digital platform designed to offer a simple and efficient way to correct tests, track student results, and analyze individual performance.
-Unlike traditional tools (like Zipgrade or GradeCam) that rely on printing and scanning physical paper, Quiz Grade completely digitizes the process—providing instant results and detailed feedback without the need for manual grading.
+Unlike traditional tools (like Zipgrade or GradeCam) that rely on printing and scanning physical paper, Quiz Grade completely digitizes the process, providing instant results and detailed feedback without the need for manual grading.
 
 
 
