@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rezultatele Mele</title>
+    <link rel="stylesheet" href="/main.css">
+    <style>
+        .results-overview {
+            max-width: 800px;
+            margin: 30px auto;
+            padding: 20px;
+            background: #f8f9fa;
+            border-left: 5px solid #007bff;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            text-align: center;
+        }
+        .results-overview h2 {
+            color: #007bff;
+        }
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .results-table th, .results-table td {
+            border: 1px solid #dee2e6;
+            padding: 10px;
+            text-align: left;
+        }
+        .results-table th {
+            background-color: #e9ecef;
+        }
+        .no-results {
+            text-align: center;
+            margin-top: 20px;
+            font-style: italic;
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <img src="/Assets/logo.png" class="logo" alt="QuizGrade Logo">
+        <nav>
+            <span>Bine ai venit, <%= user.name %>!</span>
+            <a href="/users/dashboard">Dashboard</a>
+            <a href="/users/logout">Logout</a>
+        </nav>
+    </header>
+
+    <div class="results-overview">
+        <h1>Rezultatele Testelor Tale</h1>
+        <% if (results.length > 0) { %>
+            <h2>Nota Medie Generală: <span style="color: #28a745;"><%= overallGrade %>%</span></h2>
+            
+            <table class="results-table">
+                <thead>
+                    <tr>
+                        <th>Titlu Quiz</th>
+                        <th>Scor Obținut</th>
+                        <th>Data Susținerii</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% results.forEach(function(result) { %>
+                        <tr>
+                            <td><%= result.title %></td>
+                            <td>
+                                <% if (result.status === 'pending_grading') { %>
+                                    <span style="color: orange; font-weight: bold;">În așteptare (Pending)</span>
+                                <% } else { %>
+                                    <%= parseFloat(result.score).toFixed(2) %>%
+                                <% } %>
+                            </td>
+                            <td><%= new Date(result.taken_at).toLocaleDateString() %></td>
+                        </tr>
+                    <% }); %>
+                </tbody>
+            </table>
+        <% } else { %>
+            <p class="no-results">Nu ai susținut încă niciun test.</p>
+        <% } %>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 QuizGrade</p>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notare Test</title>
+    <link rel="stylesheet" href="/main.css">
+    <style>
+        .grading-panel {
+            max-width: 900px;
+            margin: 20px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .student-info {
+            background-color: #f1f8ff;
+            padding: 15px;
+            border-left: 5px solid #007bff;
+            margin-bottom: 25px;
+            border-radius: 4px;
+        }
+        .answer-card {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 6px;
+        }
+        .answer-card.auto-correct { border-left: 5px solid #4CAF50; } 
+        .answer-card.needs-review { border-left: 5px solid #ff9800; background-color: #fffbf2; } 
+        
+        .q-text { font-weight: bold; font-size: 1.1em; margin-bottom: 10px; display: block; }
+        .label { font-size: 0.8em; text-transform: uppercase; color: #666; font-weight: bold; }
+        
+        .student-response { 
+            padding: 10px; 
+            background: #f9f9f9; 
+            border-radius: 4px; 
+            margin: 5px 0 10px 0;
+            font-family: monospace;
+            font-size: 1.1em;
+        }
+        
+        .correct-ref { color: #4CAF50; font-size: 0.9em; }
+
+        .grading-footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .score-input {
+            font-size: 1.5em;
+            width: 100px;
+            padding: 5px;
+            text-align: center;
+            border: 2px solid #007bff;
+            border-radius: 5px;
+        }
+        .btn-submit {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 1.1em;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .btn-submit:hover { background-color: #45a049; }
+    </style>
+</head>
+<body>
+    <header>
+        <img src="/Assets/logo.png" class="logo" alt="QuizGrade Logo">
+        <nav>
+            <a href="/users/grading">Inapoi la Lista</a>
+        </nav>
+    </header>
+
+    <div class="grading-panel">
+        <div class="student-info">
+            <h2>Evaluare: <%= submission.quiz_title %></h2>
+            <p><strong>Student:</strong> <%= submission.student_name %></p>
+            <p><strong>Nota Calculată Automat (Preliminară):</strong> <%= parseFloat(submission.score).toFixed(2) %>%</p>
+        </div>
+
+        <form action="/users/grading/<%= submission.id %>" method="POST">
+            
+            <% answers.forEach(function(ans, index) { %>
+                <% let cardClass = (ans.type === 'fill_in_the_blank' || ans.type === 'text') ? 'needs-review' : 'auto-correct'; %>
+                
+                <div class="answer-card <%= cardClass %>">
+                    <span class="q-text">Întrebarea <%= index + 1 %>: <%= ans.question_text %></span>
+                    
+                    <div class="label">Răspunsul Studentului:</div>
+                    <div class="student-response"><%= ans.answer_text || "(Fără răspuns)" %></div>
+
+                    <div class="correct-ref">
+                        <strong>Răspuns Corect (Referință):</strong> <%= ans.correct_answer %>
+                    </div>
+                    
+                    <% if(ans.type === 'fill_in_the_blank' || ans.type === 'text') { %>
+                        <p style="color: #ff9800; font-size: 0.9em;"><em>* Necesită verificare manuală</em></p>
+                    <% } %>
+                </div>
+            <% }); %>
+
+            <div class="grading-footer">
+                <div>
+                    <label for="final_score" style="display:block; margin-bottom: 5px;"><strong>Nota Finală (0-100):</strong></label>
+                    <input type="number" id="final_score" name="final_score" class="score-input" 
+                        step="0.01" min="0" max="100" value="<%= parseFloat(submission.score).toFixed(2) %>" required>
+                </div>
+                <button type="submit" class="btn-submit">Salvează Nota & Finalizează</button>
+            </div>
+
+        </form>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 QuizGrade</p>
+    </footer>
+</body>
+</html>

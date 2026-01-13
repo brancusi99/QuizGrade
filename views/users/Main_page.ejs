@@ -3,23 +3,96 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QuizGrade - Home</title>
+    <title>QuizGrade - Dashboard</title>
     <link rel="stylesheet" href="/main.css">
+    <style>
+        .quiz-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .quiz-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            border-left: 5px solid #4CAF50;
+        }
+        .quiz-card h3 { margin-top: 0; }
+        .quiz-card small { color: #666; }
+        .quiz-actions { margin-top: 15px; }
+        .btn-start {
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+    </style>
 </head>
 <body>
     <header>
         <img src="/Assets/logo.png" class="logo" alt="QuizGrade Logo">
         <nav>
-            <a href="users/login">Login</a>
-            <a href="users/register">Register</a>
+            <span>Bine ai venit, <%= user.name %>!</span>
+            <% if (user.role === 'student') { %>
+                <a href="/users/my-results">Rezultatele Mele</a>
+            <% } %>
+            <a href="/users/logout">Logout</a>
         </nav>
     </header>
 
     <section class="hero">
-        <h1>QuizGrade</h1>
-        <p>Platformă modernă pentru teste digitale și managementul notelor.</p>
-        <a href="professor" class="btn">Începe</a>
+        <h1>QuizGrade Dashboard</h1>
+        <p>Gestionează testele tale sau creează unul nou.</p>
+        <% if (user.role === 'professor') { %>
+            <div style="margin-top: 15px;">
+                <a href="/users/create_page" class="btn">Creează Quiz Nou</a> <a href="/users/grading" class="btn" style="background-color: #ff9800;">Evaluări în Așteptare</a>
+            </div>
+        <% } %>
     </section>
+
+    <section>
+    <h2 style="text-align: center; margin-top: 30px;"><%= pageHeader %></h2>
+    
+    <div class="quiz-grid">
+        <% if (typeof quizzes !== 'undefined' && quizzes.length > 0) { %>
+            
+            <% quizzes.forEach(function(quiz) { %>
+                <div class="quiz-card">
+                    <h3><%= quiz.title %></h3>
+                    
+                    <% if (user.role === 'student') { %>
+                        <p><small>Profesor: <%= quiz.professor_name %></small></p>
+                    <% } %>
+
+                    <p><small>Creat la: <%= new Date(quiz.created_at).toLocaleDateString() %></small></p>
+                    
+                    <div class="quiz-actions">
+                        <% if (user.role === 'student') { %>
+                            <a href="/users/quiz/<%= quiz.id %>" class="btn-start">Începe Testul</a>
+                        <% } else { %>
+                            <a href="/users/quiz/<%= quiz.id %>/edit" class="btn-start" style="background-color: #6c757d;">Editează</a>
+                            
+                            <a href="/users/quiz/<%= quiz.id %>/all_results" class="btn-start" style="background-color: #007bff; margin-left: 5px;">Vezi Note</a>
+                        <% } %>
+                    </div>
+                </div>
+            <% }); %>
+
+        <% } else { %>
+            <% if (user.role === 'student') { %>
+                <p style="text-align: center;">Niciun test disponibil momentan.</p>
+            <% } else { %>
+                <p style-align: center;>Nu ai creat niciun test încă.</p>
+            <% } %>
+        <% } %>
+    </div>
+</section>
 
     <footer>
         <p>&copy; 2025 QuizGrade</p>

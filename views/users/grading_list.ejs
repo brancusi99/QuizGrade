@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuizGrade - Evaluări</title>
+    <link rel="stylesheet" href="/main.css">
+    <style>
+        .grading-container {
+            max-width: 1000px;
+            margin: 30px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f8f9fa;
+            color: #333;
+        }
+        .btn-grade {
+            background-color: #ff9800;
+            color: white;
+            text-decoration: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <img src="/Assets/logo.png" class="logo" alt="QuizGrade Logo">
+        <nav>
+            <span>Profesor: <%= user.name %></span>
+            <a href="/users/dashboard">Înapoi la Dashboard</a>
+            <a href="/users/logout">Logout</a>
+        </nav>
+    </header>
+
+    <section class="hero">
+        <h1>Evaluări în Așteptare</h1>
+        <p>Lista studenților care au completat teste cu întrebări deschise.</p>
+    </section>
+
+    <div class="grading-container">
+        <% if (submissions && submissions.length > 0) { %>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Student</th>
+                        <th>Test (Quiz)</th>
+                        <th>Data Trimiterii</th>
+                        <th>Acțiune</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% submissions.forEach(function(sub) { %>
+                        <tr>
+                            <td><%= sub.student_name %></td>
+                            <td><%= sub.quiz_title %></td>
+                            <td><%= new Date(sub.taken_at).toLocaleString('ro-RO') %></td>
+                            <td>
+                                <a href="/users/grading/<%= sub.result_id %>" class="btn-grade">Notează</a>
+                            </td>
+                        </tr>
+                    <% }); %>
+                </tbody>
+            </table>
+        <% } else { %>
+            <div class="empty-state">
+                <h3>Nu există teste în așteptare!</h3>
+                <p>Toate testele au fost notate sau nu conțin întrebări deschise.</p>
+            </div>
+        <% } %>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 QuizGrade</p>
+    </footer>
+</body>
+</html>

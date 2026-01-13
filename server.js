@@ -1,7 +1,7 @@
 import express from 'express'
 // import fetch from 'node-fetch'
 // import cors from 'cors'
-// import session from 'express-session'
+import session from 'express-session'
 import userRouter from './routes/users.js';
 
 const app = express();
@@ -11,6 +11,12 @@ app.use(express.static("public"))
 //allows access to info coming from forms
 app.use(express.urlencoded({extended:true}))
 app.use(express.json())
+app.use(session({
+    secret: 'a-very-secret-key-that-is-long-and-secure', // It's recommended to use an environment variable for the secret
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: false } // Set to true if you are using HTTPS
+}));
 
 app.set('view engine', 'ejs')
 app.use(logger)

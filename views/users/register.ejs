@@ -11,10 +11,15 @@
         <img src="/Assets/logo.png" class="logo" alt="QuizGrade Logo">
         <h2>Înregistrare</h2>
 
-        <form id="registerForm" action="/users" method="POST">
+        <form id="registerForm" action="/users/register" method="POST">
             <input type="text" name="name" placeholder="Nume complet" required>
             <input type="email" name="email" placeholder="Email" required>
             <input type="password" name="password" placeholder="Parola" required>
+            <select name="role" required>
+                <option value="" disabled selected>Selectează rolul</option>
+                <option value="student">Student</option>
+                <option value="professor">Profesor</option>
+            </select>
             <button type="submit">Creează cont</button>
         </form>
 

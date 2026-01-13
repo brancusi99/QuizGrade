@@ -3,36 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Quiz - QuizGrade</title>
+    <title>Edit Quiz - <%= quiz.title %></title>
     <link rel="stylesheet" href="/create_page.css">
 </head>
 <body>
 
     <div class="container">
-        <h1>Create New Quiz</h1>
+        <h1>Edit Quiz</h1>
         
         <form id="quizForm" onsubmit="submitQuiz(event)">
             <div class="form-group">
                 <label>Quiz Title</label>
-                <input type="text" name="title" placeholder="e.g., Math Final Exam" required>
-            </div>
-
-            <div class="form-group" style="background: #e3f2fd; padding: 15px; border-radius: 5px; border: 1px solid #90caf9;">
-                <label style="display: flex; align-items: center; cursor: pointer;">
-                    <input type="checkbox" id="useAiCheck" style="width: 20px; height: 20px; margin-right: 10px;">
-                    <span>Activează Corectarea Automată cu AI (pentru întrebări text)</span>
-                </label>
-                <small style="color: #666; display: block; margin-top: 5px;">
-                    Dacă bifezi, AI-ul va nota automat răspunsurile scrise. Dacă nu, va trebui să le notezi manual.
-                </small>
+                <input type="text" name="title" value="<%= quiz.title %>" required>
             </div>
 
             <div id="questions-container">
-                </div>
+                <% questions.forEach(function(question, index) { %>
+                    <div class="question-card">
+                        <button type="button" class="remove-btn" onclick="removeQuestion(this)">Remove</button>
+                        
+                        <div class="form-group">
+                            <label>Question Text</label>
+                            <input type="text" name="questions[][text]" value="<%= question.text %>" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Question Type</label>
+                            <select name="questions[][type]" onchange="changeType(this)">
+                                <option value="multiple-choice" <%= question.type === 'multiple-choice' ? 'selected' : '' %>>Multiple Choice</option>
+                                <option value="fill-blank" <%= question.type === 'fill-blank' ? 'selected' : '' %>>Fill in the Blank</option>
+                            </select>
+                        </div>
+
+                        <div class="answer-section">
+                            <% if (question.type === 'multiple-choice') { %>
+                                <label>Answers (Select the correct bubble)</label>
+                                <% question.options.forEach(function(option, i) { %>
+                                    <div class="mc-option">
+                                        <input type="radio" name="q_<%= index %>_correct" <%= option === question.correct_answer ? 'checked' : '' %> required>
+                                        <input type="text" name="questions[][options][]" value="<%= option %>" required>
+                                    </div>
+                                <% }); %>
+                            <% } else { %>
+                                <label>Correct Answer</label>
+                                <input type="text" name="questions[][correct_answer]" value="<%= question.correct_answer %>" required>
+                            <% } %>
+                        </div>
+                    </div>
+                <% }); %>
+            </div>
 
             <div class="btn-container">
                 <button type="button" class="btn btn-add" onclick="addQuestion()">+ Add Question</button>
-                <button type="submit" class="btn btn-save">Save Quiz</button>
+                <button type="submit" class="btn btn-save">Update Quiz</button>
             </div>
         </form>
     </div>
@@ -50,7 +73,7 @@
                 <label>Question Type</label>
                 <select name="questions[][type]" onchange="changeType(this)">
                     <option value="multiple-choice">Multiple Choice</option>
-                    <option value="fill_in_the_blank">Fill in the Blank</option>
+                    <option value="fill-blank">Fill in the Blank</option>
                 </select>
             </div>
 
@@ -77,10 +100,7 @@
     </template>
 
     <script>
-        let questionCount = 0;
-
         function addQuestion() {
-            questionCount++;
             const container = document.getElementById('questions-container');
             const template = document.getElementById('question-template');
             const clone = template.content.cloneNode(true);
@@ -101,14 +121,14 @@
         function changeType(select) {
             const card = select.closest('.question-card');
             const answerSection = card.querySelector('.answer-section');
+            const uniqueName = 'q_' + Math.random().toString(36).substr(2, 9);
             
-            if (select.value === 'fill_in_the_blank') {
+            if (select.value === 'fill-blank') {
                 answerSection.innerHTML = `
                     <label>Correct Answer</label>
                     <input type="text" name="questions[][correct_answer]" placeholder="Type the correct word/phrase" required>
                 `;
             } else {
-                const uniqueName = 'q_' + Math.random().toString(36).substr(2, 9);
                 answerSection.innerHTML = `
                     <label>Answers (Select the correct bubble)</label>
                     <div class="mc-option">
@@ -132,13 +152,9 @@
         }
 
         async function submitQuiz(e) {
-            e.preventDefault(); 
+            e.preventDefault();
 
             const title = document.querySelector('input[name="title"]').value;
-            
-            const useAiCheckbox = document.getElementById('useAiCheck');
-            const useAi = useAiCheckbox ? useAiCheckbox.checked : false;
-
             const questionCards = document.querySelectorAll('.question-card');
             const questionsData = [];
 
@@ -154,8 +170,8 @@
                         const radio = div.querySelector('input[type="radio"]');
                         const inputVal = div.querySelector('input[type="text"]').value;
                         
-                        if (inputVal) options.push(inputVal); 
-                        if (radio && radio.checked) correctAnswer = inputVal; 
+                        if (inputVal) options.push(inputVal);
+                        if (radio && radio.checked) correctAnswer = inputVal;
                     });
                 } else {
                     const correctInput = card.querySelector('input[name="questions[][correct_answer]"]');
@@ -163,39 +179,33 @@
                 }
 
                 questionsData.push({
-                    text: text,
-                    type: type,
-                    options: options,
+                    text,
+                    type,
+                    options,
                     correct_answer: correctAnswer
                 });
             });
 
             try {
-                const response = await fetch('/users/create_quiz', {
+                const response = await fetch('/users/quiz/<%= quiz.id %>/edit', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        title: title, 
-                        questions: questionsData,
-                        use_ai: useAi 
-                    })
+                    body: JSON.stringify({ title, questions: questionsData })
                 });
 
                 const result = await response.json();
                 
                 if (result.success) {
-                    alert("Quiz creat cu succes!");
-                    window.location.href = "/users/dashboard"; 
+                    alert("Quiz updated successfully!");
+                    window.location.href = "/users/dashboard";
                 } else {
-                    alert("Eroare: " + (result.error || "Ceva nu a mers bine"));
+                    alert("Error: " + (result.error || "Something went wrong"));
                 }
             } catch (err) {
                 console.error(err);
-                alert("A aparut o eroare de conexiune.");
+                alert("A connection error occurred.");
             }
         }
-
-        window.onload = addQuestion;
     </script>
 </body>
 </html>
